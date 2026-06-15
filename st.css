@@ -9,11 +9,54 @@ body {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     background-color: #f4f7f6;
     color: #2d3748;
-    padding: 4rem 2rem;
+    min-height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    align-items: flex-start;
+}
+
+.page-wrapper {
+    width: 100%;
+    max-width: 1280px;
+    padding: 4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+/* --- JS Filter Navigation Menu --- */
+.filter-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+    background: #ffffff;
+    padding: 0.75rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.filter-btn {
+    background: none;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #718096;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.filter-btn:hover {
+    color: #4f46e5;
+    background-color: #f3f2ff;
+}
+
+.filter-btn.active {
+    background-color: #4f46e5;
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
 }
 
 /* --- Grid Container --- */
@@ -22,49 +65,56 @@ body {
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 2.5rem;
     width: 100%;
-    max-width: 1280px;
 }
 
-/* --- Card Styling --- */
+/* --- Card Layout & Animations --- */
 .card {
     background: #ffffff;
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                box-shadow 0.4s ease;
+                box-shadow 0.4s ease,
+                opacity 0.3s ease,
+                scale 0.3s ease;
     display: flex;
     flex-direction: column;
     cursor: pointer;
+    transform-origin: center;
 }
 
-/* Hover Effects */
 .card:hover {
     transform: translateY(-10px);
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-/* Card Image Banners (Updated for Photos) */
+/* JS Filter State Classes */
+.card.hidden {
+    display: none;
+    opacity: 0;
+    scale: 0.8;
+}
+
+/* Inner Card Structure */
 .card-image {
     height: 200px;
     width: 100%;
     position: relative;
-    overflow: hidden; /* Ensures image is clipped within radius */
+    overflow: hidden;
 }
 
 .card-image img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Important: maintains aspect ratio and covers the area */
-    display: block; /* Prevents tiny gap at bottom of image */
+    object-fit: cover;
+    display: block;
 }
 
-/* Badge/Tag */
 .card-badge {
     position: absolute;
     top: 1rem;
     left: 1rem;
-    background: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.95);
     padding: 0.35rem 0.8rem;
     border-radius: 50px;
     font-size: 0.75rem;
@@ -72,10 +122,9 @@ body {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: #4a5568;
-    z-index: 1; /* Keeps badge above the image */
+    z-index: 1;
 }
 
-/* Card Body Content */
 .card-body {
     padding: 1.75rem;
     display: flex;
@@ -99,7 +148,6 @@ body {
     flex-grow: 1;
 }
 
-/* Card Footer / Metadata alignment */
 .card-footer {
     display: flex;
     align-items: center;
@@ -115,19 +163,18 @@ body {
     gap: 0.75rem;
 }
 
-/* Author Avatar (Updated for Photos) */
 .author-avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    overflow: hidden; /* Ensures avatar image is a circle */
-    background: #e2e8f0; /* Fallback background */
+    overflow: hidden;
+    background: #e2e8f0;
 }
 
 .author-avatar img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Circular crop of avatar photo */
+    object-fit: cover;
     display: block;
 }
 
@@ -152,4 +199,105 @@ body {
 
 .action-btn:hover {
     color: #3730a3;
+}
+
+/* --- JS Modal Overlay Popup --- */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 32, 44, 0.4);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-window {
+    background: #ffffff;
+    width: 100%;
+    max-width: 600px;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    position: relative;
+    transform: translateY(40px) scale(0.95);
+    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.modal-overlay.open .modal-window {
+    transform: translateY(0) scale(1);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.85);
+    border: none;
+    width: 36px;
+    height: 36px;
+    font-size: 1.5rem;
+    font-weight: 400;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #1a202c;
+    z-index: 10;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.modal-close-btn:hover {
+    background: #ffffff;
+    transform: scale(1.1);
+}
+
+.modal-hero {
+    height: 280px;
+    position: relative;
+    width: 100%;
+}
+
+.modal-hero img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-content-area {
+    padding: 2.5rem;
+}
+
+#modalTitle {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: #1a202c;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+#modalDesc {
+    font-size: 1.05rem;
+    color: #4a5568;
+    line-height: 1.7;
+    margin-bottom: 2rem;
+}
+
+.modal-author-info {
+    border-top: 1px solid #edf2f7;
+    padding-top: 1.25rem;
 }
